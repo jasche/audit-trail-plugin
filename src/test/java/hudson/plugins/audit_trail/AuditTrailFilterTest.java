@@ -72,6 +72,7 @@ public class AuditTrailFilterTest {
         j.submit(form);
 
         String log = Util.loadFile(new File(tmpDir.getRoot(), "create-item.log.0"), StandardCharsets.UTF_8);
+        System.out.println("DBG "+ log);
         assertTrue("logged actions: " + log, Pattern.compile(".*createItem \\(" + jobName + "\\).*by \\QNA from 127.0.0.1\\E.*", Pattern.DOTALL).matcher(log).matches());
 
     }

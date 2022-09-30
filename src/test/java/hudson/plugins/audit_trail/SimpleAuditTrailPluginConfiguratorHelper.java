@@ -4,6 +4,9 @@ import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.jvnet.hudson.test.JenkinsRule;
 
+import hudson.security.AuthorizationStrategy;
+import org.jvnet.hudson.test.MockAuthorizationStrategy;
+import hudson.security.SecurityRealm;
 import java.io.File;
 
 import static hudson.plugins.audit_trail.LogFileAuditLogger.DEFAULT_LOG_SEPARATOR;
@@ -43,7 +46,9 @@ public class SimpleAuditTrailPluginConfiguratorHelper {
 
     public void sendConfiguration(JenkinsRule j, JenkinsRule.WebClient wc) throws Exception {
         HtmlPage configure = wc.goTo("configure");
+        assert configure != null : "configure page is null";
         HtmlForm form = configure.getFormByName("config");
+        assert form != null : "configure form is null";
         j.getButtonByCaption(form, ADD_LOGGER_BUTTON_TEXT).click();
         configure.getAnchorByText(LOG_FILE_COMBO_TEXT).click();
         wc.waitForBackgroundJavaScript(TIMEOUT);

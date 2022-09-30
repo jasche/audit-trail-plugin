@@ -16,14 +16,17 @@ import org.jvnet.hudson.test.JenkinsRule;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
-import static org.junit.Assert.assertTrue;
+import java.text.*;
+
+import static org.junit.Assert.*;
 
 /**
  * Created by Pierre Beitz
  * on 31/12/2019.
  */
-public class AuditTrailRunListenerTest {
+public class AuditTrailRunListenerTest  implements AuditEvents {
     @Rule
     public JenkinsRule j = new JenkinsRule();
     @Rule
@@ -44,7 +47,19 @@ public class AuditTrailRunListenerTest {
         job.scheduleBuild2(0, new Cause.UserIdCause()).get();
 
         String log = Util.loadFile(new File(tmpDir.getRoot(), logFileName + ".0"), StandardCharsets.UTF_8);
-        assertTrue("logged actions: " + log, Pattern.compile(".*, Parameters:\\[stringParam: \\{value1\\}, booleanParam: \\{false\\}\\].*", Pattern.DOTALL).matcher(log).matches());
+        //assertTrue("logged actions: " + log, Pattern.compile(".*, XParameters:\\[stringParam: \\{value1\\}, booleanParam: \\{false\\}\\].*", Pattern.DOTALL).matcher(log).matches());
+        Matcher matcher = jobStartRegex.matcher(log);        
+        System.out.println("DBG "+ log);
+        assertTrue("Match",matcher.find());
+        assertEquals("Test Event", "test-job",matcher.group(1));
+        assertEquals("Test User", "SYSTEM" , matcher.group(2));
+        matcher = jobStopRegex.matcher(log);        
+        assertTrue("Match",matcher.find());
+        assertEquals("Test Event", "test-job",matcher.group(1));
+        assertEquals("Test User", "SYSTEM" , matcher.group(2));
+        assertEquals("Test Node", "Jenkins" , matcher.group(3));
+        assertNotNull("Test Date", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(matcher.group(4)));
+
     }
 
     @Issue("JENKINS-12848")
@@ -59,7 +74,18 @@ public class AuditTrailRunListenerTest {
         job.scheduleBuild2(0, new Cause.UserIdCause()).get();
 
         String log = Util.loadFile(new File(tmpDir.getRoot(), logFileName + ".0"), StandardCharsets.UTF_8);
-        assertTrue("logged actions: " + log, Pattern.compile(".*, Parameters:\\[\\].*", Pattern.DOTALL).matcher(log).matches());
+//        assertTrue("logged actions: " + log, Pattern.compile(".*, Parameters:\\[\\].*", Pattern.DOTALL).matcher(log).matches());
+        Matcher matcher = jobStartRegex.matcher(log);        
+        System.out.println("DBG "+ log);
+        assertTrue("Match",matcher.find());
+        assertEquals("Test Event", "test-job",matcher.group(1));
+        assertEquals("Test User", "SYSTEM" , matcher.group(2));
+        matcher = jobStopRegex.matcher(log);        
+        assertTrue("Match",matcher.find());
+        assertEquals("Test Event", "test-job",matcher.group(1));
+        assertEquals("Test User", "SYSTEM" , matcher.group(2));
+        assertEquals("Test Node", "Jenkins" , matcher.group(3));
+        assertNotNull("Test Date", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(matcher.group(4)));
     }
 
     @Issue("JENKINS-12848")
@@ -75,8 +101,19 @@ public class AuditTrailRunListenerTest {
         job.scheduleBuild2(0, new Cause.UserIdCause()).get();
 
         String log = Util.loadFile(new File(tmpDir.getRoot(), logFileName + ".0"), StandardCharsets.UTF_8);
-        assertTrue("logged actions: " + log, Pattern.compile(".*, Parameters:\\[passParam: \\{\\*\\*\\*\\*\\}\\].*", Pattern.DOTALL).matcher(log).matches());
-    }
+//        assertTrue("logged actions: " + log, Pattern.compile(".*, Parameters:\\[passParam: \\{\\*\\*\\*\\*\\}\\].*", Pattern.DOTALL).matcher(log).matches());
+        Matcher matcher = jobStartRegex.matcher(log);        
+        System.out.println("DBG "+ log);
+        assertTrue("Match",matcher.find());
+        assertEquals("Test Event", "test-job",matcher.group(1));
+        assertEquals("Test User", "SYSTEM" , matcher.group(2));
+        matcher = jobStopRegex.matcher(log);        
+        assertTrue("Match",matcher.find());
+        assertEquals("Test Event", "test-job",matcher.group(1));
+        assertEquals("Test User", "SYSTEM" , matcher.group(2));
+        assertEquals("Test Node", "Jenkins" , matcher.group(3));
+        assertNotNull("Test Date", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(matcher.group(4)));
+}
 
     @Issue("JENKINS-62812")
     @Test
